@@ -1,0 +1,29 @@
+name: CI Validation - zenith-stack-44
+
+on:
+  schedule:
+    - cron: '47 23,4,10,18 * * *'
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11']
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install and Validate Dependency
+        run: |
+          python3 -m pip install --upgrade pip
+          python3 -m pip install .
+          python3 -c "import importlib.metadata; print('Successfully resolved version:', importlib.metadata.version('roguard-child-safety'))"
+          python3 -m pip cache purge
